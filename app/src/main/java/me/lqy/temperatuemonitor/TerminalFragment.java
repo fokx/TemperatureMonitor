@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -30,6 +31,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -59,8 +62,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private static final float MAX_TEMPERATURE = (float) 50.0;
     private static final float MIN_TEMPERATURE = (float) 10.0;
     // Normally death, or there may be serious brain damage, continuous convulsions and shock.
-    private static final float ALERT_POINT_UPBOUND = (float) 37.3;
-    private static final float BIRATE_POINT_UPBOUND = ALERT_POINT_UPBOUND;
+    private static final float ALERT_POINT_UPBOUND = (float) 37.3; // a line in chart
+    private static final float VIBRATE_UPBOUND = ALERT_POINT_UPBOUND; // vibrate
 
     private enum Connected {False, Pending, True}
 
@@ -85,6 +88,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private String deviceAddress;
     private String newline = "\r\n";
     private TextView receivedText;
+    private View colorfulBackground;
     private TextView currentPointText;
     private SerialSocket socket;
     //    private SerialService service;
@@ -101,6 +105,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private View sendDiv;
     private View toggleViewPointsBtn;
     private WebView viewPoints;
+    Toolbar toolbar;
 
     /*
      * Lifecycle
@@ -195,6 +200,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         setLegend();
 //        mChart.setVisibility(View.INVISIBLE);
 
+        colorfulBackground = view.findViewById(R.id.colorfulbackground);
         receivedText = view.findViewById(R.id.received_text);                          // TextView performance decreases with number of spans
         receivedText.setTextColor(getResources().getColor(R.color.colorReceiveText)); // set as default color to reduce number of spans
         receivedText.setMovementMethod(ScrollingMovementMethod.getInstance());
@@ -228,6 +234,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
         Log.w("CONNECTING TO", webviewAddress);
         viewPoints.loadUrl(webviewAddress);
+
+
 
         return view;
     }
@@ -354,6 +362,22 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         return str.substring(start);
     }
 
+    private float interpolate(float a, float b, float proportion) {
+        return (a + ((b - a) * proportion));
+    }
+
+    private int interpolateColor(int a, int b, float proportion) {
+        float[] hsva = new float[3];
+        float[] hsvb = new float[3];
+        Color.colorToHSV(a, hsva);
+        Color.colorToHSV(b, hsvb);
+        assert (proportion <= 1.0 && proportion >= 0.0);
+        for (int i = 0; i < 3; i++) {
+            hsvb[i] = interpolate(hsva[i], hsvb[i], proportion);
+        }
+        return Color.HSVToColor(hsvb);
+    }
+
 
     private void receive(byte[] data) {
         String received_text_raw = new String(data);
@@ -366,10 +390,31 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             received_point = Float.parseFloat(received_text);
             insert_flag = true;
 
-            if (received_point > ALERT_POINT_UPBOUND) {
+            if (received_point > VIBRATE_UPBOUND) {
                 Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(400);
             }
+
+            // Dyanamic background color according to point received
+//        int colorCold=getResources().getColor(R.color.colorCold);
+            int colorCold = ContextCompat.getColor(getContext(), R.color.colorCold); // -13330213
+            int colorWarm = ContextCompat.getColor(getContext(), R.color.colorWarm); // -44234
+
+            float LOWEST_VALUE = 27;
+            float HIGHEST_VALUE = 35;
+            float propotion = (received_point - LOWEST_VALUE) / (HIGHEST_VALUE - LOWEST_VALUE);
+            if (received_point > HIGHEST_VALUE) {
+                propotion = 1;
+            } else if (received_point < LOWEST_VALUE) {
+                propotion = 0;
+            }
+            // propotion = 0.3 -> interpolatedColor = -13244800
+            int colorInterpolated = interpolateColor(colorCold, colorWarm, propotion);
+            colorfulBackground.setBackgroundColor(colorInterpolated);
+//            // cannot set toolbar background color
+//            toolbar.setBackgroundDrawable(new ColorDrawable(colorInterpolated));
+//            toolbar.setBackground(new ColorDrawable(colorInterpolated));
+//            toolbar.setBackgroundColor(colorInterpolated);
         } catch (Exception e) {
             insert_flag = false;
             Log.w("NotValidFloat", received_text);
@@ -440,6 +485,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         mChart.setDrawGridBackground(false);
         // set an alternative background color
         mChart.setBackgroundColor(Color.WHITE);
+        mChart.setAlpha((float) 0.85);
     }
 
     private void setupAxes() {
@@ -518,7 +564,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private LineDataSet createSet() {
         LineDataSet set = new LineDataSet(null, "Memory Data");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        set.setColors(ColorTemplate.COLORFUL_COLORS[4]);
+//        set.setColors(ColorTemplate.MATERIAL_COLORS[0]);
+        set.setColors(ColorTemplate.PASTEL_COLORS[0]);
         set.setCircleColor(Color.BLACK);
         set.setLineWidth(2f);
         set.setCircleRadius(4f);

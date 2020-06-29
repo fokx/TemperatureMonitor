@@ -7,4 +7,9 @@
     <color name="colorSendText">#82CAFF</color>
     <color name="colorStatusText">#FFDB58</color>
     <color name="colorAppTitle">#FFFFFF</color>
+    <color name="colorBackground">#3498db</color>
+    <color name="colorCold">#3498db</color>
+    <color name="colorWarm">#ff5336</color>
+
+
 </resources>
