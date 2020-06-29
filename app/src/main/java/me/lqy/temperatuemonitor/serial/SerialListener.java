@@ -1,6 +1,6 @@
-package me.lqy.temperatuemonitor;
+package me.lqy.temperatuemonitor.serial;
 
-interface SerialListener {
+public interface SerialListener {
     void onSerialConnect();
 
     void onSerialConnectError(Exception e);

@@ -1,4 +1,4 @@
-package me.lqy.temperatuemonitor;
+package me.lqy.temperatuemonitor.serial;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -18,6 +18,9 @@ import androidx.core.app.NotificationCompat;
 
 import java.util.LinkedList;
 import java.util.Queue;
+
+import me.lqy.temperatuemonitor.Constants;
+import me.lqy.temperatuemonitor.R;
 
 /**
  * create notification and queue serial data while activity is not in the foreground
@@ -239,8 +242,8 @@ public class SerialService extends Service implements SerialListener {
 
     private enum QueueType {Connect, ConnectError, Read, IoError}
 
-    class SerialBinder extends Binder {
-        SerialService getService() {
+    public class SerialBinder extends Binder {
+        public SerialService getService() {
             return SerialService.this;
         }
     }

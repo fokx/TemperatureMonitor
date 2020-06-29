@@ -1,4 +1,4 @@
-package me.lqy.temperatuemonitor;
+package me.lqy.temperatuemonitor.database;
 
 import java.util.Date;
 

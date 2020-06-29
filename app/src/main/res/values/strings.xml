@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">T Monitor</string>
+    <string name="app_name">Temperature Monitor</string>
 
     <string name="location_permission_title">Location permission required</string>
     <string name="location_permission_message">This app does not use location information, but scanning for Bluetooth LE devices requires this permission.</string>

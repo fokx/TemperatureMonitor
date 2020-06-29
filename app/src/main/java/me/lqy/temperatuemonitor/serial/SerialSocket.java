@@ -1,4 +1,4 @@
-package me.lqy.temperatuemonitor;
+package me.lqy.temperatuemonitor.serial;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -19,12 +19,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
+import me.lqy.temperatuemonitor.Constants;
+import me.lqy.temperatuemonitor.R;
+
 /**
  * wrap BLE communication into socket like class
  * - connect, disconnect and write as methods,
  * - read + status is returned by SerialListener
  */
-class SerialSocket extends BluetoothGattCallback {
+public class SerialSocket extends BluetoothGattCallback {
     private static final UUID BLUETOOTH_LE_CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private static final UUID BLUETOOTH_LE_CC254X_SERVICE = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
     private static final UUID BLUETOOTH_LE_CC254X_CHAR_RW = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");

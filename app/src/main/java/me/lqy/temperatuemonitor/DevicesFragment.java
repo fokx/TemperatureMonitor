@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +35,7 @@ import java.util.Collections;
 
 public class DevicesFragment extends ListFragment {
     private enum ScanState {NONE, LESCAN, DISCOVERY, DISCOVERY_FINISHED}
+
     private static final long LESCAN_PERIOD = 10000; // similar to bluetoothAdapter.startDiscovery
     private ScanState scanState = ScanState.NONE;
     private Handler leScanStopHandler = new Handler();
@@ -44,6 +46,8 @@ public class DevicesFragment extends ListFragment {
     private BluetoothAdapter bluetoothAdapter;
     private ArrayList<BluetoothDevice> listItems = new ArrayList<>();
     private ArrayAdapter<BluetoothDevice> listAdapter;
+
+    private boolean fist_scanned = true;
 
     public DevicesFragment() {
         leScanCallback = (device, rssi, scanRecord) -> {
@@ -93,6 +97,7 @@ public class DevicesFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
         if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH))
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         listAdapter = new ArrayAdapter<BluetoothDevice>(getActivity(), 0, listItems) {
@@ -108,6 +113,8 @@ public class DevicesFragment extends ListFragment {
                 else
                     text1.setText(device.getName());
                 text2.setText(device.getAddress());
+
+
                 return view;
             }
         };
@@ -134,6 +141,14 @@ public class DevicesFragment extends ListFragment {
         } else if (!bluetoothAdapter.isEnabled()) {
             menu.findItem(R.id.ble_scan).setEnabled(false);
         }
+
+        // !
+        // perform first scanning
+        if (fist_scanned) {
+            startScan();
+            fist_scanned = false;
+        }
+
     }
 
     @Override
@@ -141,18 +156,22 @@ public class DevicesFragment extends ListFragment {
         super.onResume();
         getActivity().registerReceiver(discoveryBroadcastReceiver, discoveryIntentFilter);
         if (bluetoothAdapter == null) {
-            setEmptyText("<bluetooth LE not supported>");
+            setEmptyText("bluetooth LE not supported on this device!");
         } else if (!bluetoothAdapter.isEnabled()) {
-            setEmptyText("<bluetooth is disabled>");
+            setEmptyText("Bluetooth is disabled, please enable it in system setting.");
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, 1);
+
             if (menu != null) {
                 listItems.clear();
                 listAdapter.notifyDataSetChanged();
                 menu.findItem(R.id.ble_scan).setEnabled(false);
             }
         } else {
-            setEmptyText("<use SCAN to refresh devices>");
-            if (menu != null)
+            setEmptyText("Press SCAN to start pairing a device.");
+            if (menu != null) {
                 menu.findItem(R.id.ble_scan).setEnabled(true);
+            }
         }
     }
 
@@ -193,18 +212,29 @@ public class DevicesFragment extends ListFragment {
         if (scanState != ScanState.NONE)
             return;
         scanState = ScanState.LESCAN;
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
                 scanState = ScanState.NONE;
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle(R.string.location_permission_title);
                 builder.setMessage(R.string.location_permission_message);
                 builder.setPositiveButton(android.R.string.ok,
-                        (dialog, which) -> requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0));
+                        (dialog, which) -> requestPermissions(new String[]{
+                                Manifest.permission.ACCESS_COARSE_LOCATION}, 0));
                 builder.show();
                 return;
             }
-            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+//            Context ctx = getApplicationContext();
+//            Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+//
+            LocationManager locationManager = (LocationManager) getActivity().getSystemService(
+                    Context.LOCATION_SERVICE);
             boolean locationEnabled = false;
             try {
                 locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -225,7 +255,7 @@ public class DevicesFragment extends ListFragment {
         }
         listItems.clear();
         listAdapter.notifyDataSetChanged();
-        setEmptyText("<scanning...>");
+        setEmptyText("scanning...");
         menu.findItem(R.id.ble_scan).setVisible(false);
         menu.findItem(R.id.ble_scan_stop).setVisible(true);
         if (scanState == ScanState.LESCAN) {
@@ -269,7 +299,7 @@ public class DevicesFragment extends ListFragment {
     private void stopScan() {
         if (scanState == ScanState.NONE)
             return;
-        setEmptyText("<no bluetooth devices found>");
+        setEmptyText("No bluetooth devices found!");
         if (menu != null) {
             menu.findItem(R.id.ble_scan).setVisible(true);
             menu.findItem(R.id.ble_scan_stop).setVisible(false);
