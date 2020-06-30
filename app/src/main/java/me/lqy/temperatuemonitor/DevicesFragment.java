@@ -118,6 +118,21 @@ public class DevicesFragment extends ListFragment {
                 return view;
             }
         };
+
+
+//        stopScan();
+        // TODO add history device list
+        // bind terminal fragment to a specific HC-09 device
+        BluetoothDevice device =BluetoothAdapter.getDefaultAdapter().
+                getRemoteDevice("90:9A:77:23:B9:AF");
+
+        Bundle args = new Bundle();
+        args.putString("device", device.getAddress());
+        Fragment fragment = new TerminalFragment();
+        fragment.setArguments(args);
+        getFragmentManager().beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null).commit();
+        int i = 1;
+
     }
 
     @Override
@@ -328,6 +343,7 @@ public class DevicesFragment extends ListFragment {
         Fragment fragment = new TerminalFragment();
         fragment.setArguments(args);
         getFragmentManager().beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null).commit();
+        int i = 1;
     }
 
 }

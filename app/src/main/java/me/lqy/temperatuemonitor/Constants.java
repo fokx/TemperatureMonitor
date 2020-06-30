@@ -24,7 +24,7 @@ public class Constants {
     public static final String FILE_DIR = "_mydb";
     public static final String DATABASE_NAME = "realtime_points";
 
-    public static final String pcAddress = "192.168.42.232";
+    public static final String pcAddress = "192.168.42.94";
     public static final String urlAddress = "http://" + pcAddress + ":30000/points";
     public static final String webviewAddress = "http://" + pcAddress + ":30001";
 

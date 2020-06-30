@@ -16,4 +16,8 @@
     <string name="devices">Bluetooth LE Devices</string>
     <string name="clear">Clear</string>
     <string name="newline_mode">Newline Mode</string>
+    <string name="recording_true">记录中…</string>
+    <string name="recording_false">已暂停</string>
+    <string name="recording_true_showing_current_t">当前温度：</string>
+    <string name="recording_true_showing_last_t">最后的温度：</string>
 </resources>

@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -24,8 +23,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -90,6 +92,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private TextView receivedText;
     private View colorfulBackground;
     private TextView currentPointText;
+    private TextView currentPointTextLeft;
+    private TextView currentPointTextRight;
     private SerialSocket socket;
     //    private SerialService service;
     private SerialService service;
@@ -105,7 +109,14 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private View sendDiv;
     private View toggleViewPointsBtn;
     private WebView viewPoints;
-    Toolbar toolbar;
+    private ImageView imageViewSun ;
+    private ImageView img_rotate;
+    private Animation rotation;
+    private boolean darkRotateBackgroundFlag = true;
+    private TextView t_in_pic;
+    private TextView t_in_pic_pre1; // recording or not
+    private TextView t_in_pic_pre2; // recording or not
+    private boolean recording_flag = false;
 
     /*
      * Lifecycle
@@ -194,17 +205,28 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_terminal, container, false);
         mChart = (LineChart) view.findViewById(R.id.chart);
+        t_in_pic =    view.findViewById(R.id.t_in_pic);
+        t_in_pic_pre1 =    view.findViewById(R.id.t_in_pic_pre1);
+        t_in_pic_pre2 =    view.findViewById(R.id.t_in_pic_pre2);
+
         setupChart();
         setupAxes();
         setupData();
         setLegend();
 //        mChart.setVisibility(View.INVISIBLE);
-
         colorfulBackground = view.findViewById(R.id.colorfulbackground);
         receivedText = view.findViewById(R.id.received_text);                          // TextView performance decreases with number of spans
         receivedText.setTextColor(getResources().getColor(R.color.colorReceiveText)); // set as default color to reduce number of spans
         receivedText.setMovementMethod(ScrollingMovementMethod.getInstance());
+
         currentPointText = view.findViewById(R.id.current_temperature);
+        currentPointTextLeft = view.findViewById(R.id.current_temperature_left);
+        currentPointTextRight = view.findViewById(R.id.current_temperature_right);
+
+
+        imageViewSun = view.findViewById(R.id.imageViewSun);
+
+
         sendText = view.findViewById(R.id.send_text);
         sendBtn = view.findViewById(R.id.send_btn);
         startReportBtn = view.findViewById(R.id.start_report_btn);
@@ -224,7 +246,12 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         viewPoints.setVisibility(View.INVISIBLE);
 
         mChart.setVisibility(View.INVISIBLE);
+//        colorfulBackground.setVisibility(View.INVISIBLE);
 
+
+        currentPointText.setVisibility(View.INVISIBLE);
+        currentPointTextLeft.setVisibility(View.INVISIBLE);
+        currentPointTextRight.setVisibility(View.INVISIBLE);
 
 //        sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
         startReportBtn.setOnClickListener(v -> send1AndsetVisibility());
@@ -232,19 +259,60 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         toggleLogBtn.setOnClickListener(v -> toggleLogPanel());
         toggleViewPointsBtn.setOnClickListener(v -> toggleViewPoints());
 
+
+
+        img_rotate = view.findViewById(R.id.imageViewSun);
+        rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate);
+//        rotation.setFillAfter(true);
+        img_rotate.startAnimation(rotation);
+        img_rotate.setVisibility(View.INVISIBLE);
+        
         Log.w("CONNECTING TO", webviewAddress);
         viewPoints.loadUrl(webviewAddress);
+//        imageViewSun.setAlpha((float) 0.3);
 
+        if (recording_flag) {
+            t_in_pic_pre1.setText(R.string.recording_true);
+            t_in_pic_pre2.setText(R.string.recording_true_showing_current_t);
+        } else {
+            t_in_pic_pre1.setText(R.string.recording_false);
+            t_in_pic_pre2.setText(R.string.recording_true_showing_last_t);
 
-
+        }
         return view;
     }
 
     private void toggleViewPoints() {
         if (viewPoints.getVisibility() == View.INVISIBLE) {
             viewPoints.setVisibility(View.VISIBLE);
+
+            currentPointText.setVisibility(View.VISIBLE);
+            currentPointTextLeft.setVisibility(View.VISIBLE);
+            currentPointTextRight.setVisibility(View.VISIBLE);
+            img_rotate.setVisibility(View.INVISIBLE);
+//            colorfulBackground.setVisibility(View.VISIBLE);
+            darkRotateBackgroundFlag = false;
+            imageViewSun.setVisibility(View.INVISIBLE);
+            rotation.cancel();
+
+            img_rotate.setVisibility(View.INVISIBLE);
         } else if (viewPoints.getVisibility() == View.VISIBLE) {
             viewPoints.setVisibility(View.INVISIBLE);
+
+            currentPointText.setVisibility(View.INVISIBLE);
+            currentPointTextLeft.setVisibility(View.INVISIBLE);
+            currentPointTextRight.setVisibility(View.INVISIBLE);
+            img_rotate.setVisibility(View.VISIBLE);
+//            colorfulBackground.setVisibility(View.INVISIBLE);
+            darkRotateBackgroundFlag = true;
+            imageViewSun.setVisibility(View.VISIBLE);
+            rotation.start();
+            img_rotate.setVisibility(View.VISIBLE);
+
+
+
+
+
         }
 
     }
@@ -262,12 +330,21 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         startReportBtn.setVisibility(View.INVISIBLE);
         haltReportBtn.setVisibility(View.VISIBLE);
         mChart.setVisibility(View.VISIBLE);
+
     }
 
     private void send0AndsetVisibility() {
         send(String.valueOf(MCUConnectStatus.CONNECTED_AND_HALTED.getCode()));
         haltReportBtn.setVisibility(View.INVISIBLE);
         startReportBtn.setVisibility(View.VISIBLE);
+        recording_flag = false;
+        if (recording_flag) {
+            t_in_pic_pre1.setText(R.string.recording_true);
+            t_in_pic_pre2.setText(R.string.recording_true_showing_current_t);
+        } else {
+            t_in_pic_pre1.setText(R.string.recording_false);
+            t_in_pic_pre2.setText(R.string.recording_true_showing_last_t);
+        }
     }
 
     @Override
@@ -384,22 +461,23 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         String received_text = stripStart(received_text_raw, "0");
         receivedText.append(received_text);
         currentPointText.setText(received_text);
+        t_in_pic.setText(received_text.replace("\n","") + "°C");
+
         boolean insert_flag = false;
         float received_point = 0;
         try {
             received_point = Float.parseFloat(received_text);
             insert_flag = true;
 
+            recording_flag = true;
             if (received_point > VIBRATE_UPBOUND) {
                 Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(400);
             }
-
-            // Dyanamic background color according to point received
-//        int colorCold=getResources().getColor(R.color.colorCold);
             int colorCold = ContextCompat.getColor(getContext(), R.color.colorCold); // -13330213
             int colorWarm = ContextCompat.getColor(getContext(), R.color.colorWarm); // -44234
-
+            int colorRotateBackground = ContextCompat.getColor(getContext(),
+                    R.color.colorRotateBackground);
             float LOWEST_VALUE = 27;
             float HIGHEST_VALUE = 35;
             float propotion = (received_point - LOWEST_VALUE) / (HIGHEST_VALUE - LOWEST_VALUE);
@@ -408,13 +486,16 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             } else if (received_point < LOWEST_VALUE) {
                 propotion = 0;
             }
-            // propotion = 0.3 -> interpolatedColor = -13244800
             int colorInterpolated = interpolateColor(colorCold, colorWarm, propotion);
-            colorfulBackground.setBackgroundColor(colorInterpolated);
-//            // cannot set toolbar background color
-//            toolbar.setBackgroundDrawable(new ColorDrawable(colorInterpolated));
-//            toolbar.setBackground(new ColorDrawable(colorInterpolated));
-//            toolbar.setBackgroundColor(colorInterpolated);
+            if (darkRotateBackgroundFlag) {
+                colorfulBackground.setBackgroundColor(colorRotateBackground);
+                colorfulBackground.setAlpha((float) 1.0);
+
+            } else {
+                colorfulBackground.setBackgroundColor(colorInterpolated);
+                colorfulBackground.setAlpha((float) 0.7);
+            }
+
         } catch (Exception e) {
             insert_flag = false;
             Log.w("NotValidFloat", received_text);

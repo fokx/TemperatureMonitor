@@ -49,4 +49,5 @@ dependencies {
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     implementation 'com.google.code.gson:gson:2.8.6'
+//    implementation 'com.github.biansemao:ThermometerView:1.0.1'
 }
