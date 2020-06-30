@@ -271,14 +271,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         viewPoints.loadUrl(webviewAddress);
 //        imageViewSun.setAlpha((float) 0.3);
 
-        if (recording_flag) {
-            t_in_pic_pre1.setText(R.string.recording_true);
-            t_in_pic_pre2.setText(R.string.recording_true_showing_current_t);
-        } else {
-            t_in_pic_pre1.setText(R.string.recording_false);
-            t_in_pic_pre2.setText(R.string.recording_true_showing_last_t);
-
-        }
+        update_picture_related_text();
         return view;
     }
 
@@ -330,14 +323,11 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         startReportBtn.setVisibility(View.INVISIBLE);
         haltReportBtn.setVisibility(View.VISIBLE);
         mChart.setVisibility(View.VISIBLE);
+        recording_flag = true;
+        update_picture_related_text();
 
     }
-
-    private void send0AndsetVisibility() {
-        send(String.valueOf(MCUConnectStatus.CONNECTED_AND_HALTED.getCode()));
-        haltReportBtn.setVisibility(View.INVISIBLE);
-        startReportBtn.setVisibility(View.VISIBLE);
-        recording_flag = false;
+    private void update_picture_related_text(){
         if (recording_flag) {
             t_in_pic_pre1.setText(R.string.recording_true);
             t_in_pic_pre2.setText(R.string.recording_true_showing_current_t);
@@ -345,6 +335,13 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             t_in_pic_pre1.setText(R.string.recording_false);
             t_in_pic_pre2.setText(R.string.recording_true_showing_last_t);
         }
+    }
+    private void send0AndsetVisibility() {
+        send(String.valueOf(MCUConnectStatus.CONNECTED_AND_HALTED.getCode()));
+        haltReportBtn.setVisibility(View.INVISIBLE);
+        startReportBtn.setVisibility(View.VISIBLE);
+        recording_flag = false;
+        update_picture_related_text();
     }
 
     @Override
