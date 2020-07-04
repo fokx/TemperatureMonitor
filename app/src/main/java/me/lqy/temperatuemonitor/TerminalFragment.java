@@ -48,7 +48,9 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import me.lqy.temperatuemonitor.database.DatabaseHelper;
@@ -319,7 +321,19 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     }
 
     private void send1AndsetVisibility() {
-        send(String.valueOf(MCUConnectStatus.CONNECTED_AND_RUNNING.getCode()));
+        String full_message = "c";
+        full_message += String.valueOf(MCUConnectStatus.CONNECTED_AND_RUNNING.getCode());
+        full_message += "#";
+        send(full_message);
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+        String formattedDate = df.format(calendar.getTime());
+        full_message = "d";
+        full_message += formattedDate;
+        full_message += "#";
+        send(full_message);
+
         startReportBtn.setVisibility(View.INVISIBLE);
         haltReportBtn.setVisibility(View.VISIBLE);
         mChart.setVisibility(View.VISIBLE);
@@ -337,7 +351,11 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         }
     }
     private void send0AndsetVisibility() {
-        send(String.valueOf(MCUConnectStatus.CONNECTED_AND_HALTED.getCode()));
+        String full_message = "c";
+        full_message += String.valueOf(MCUConnectStatus.CONNECTED_AND_RUNNING.getCode());
+        full_message += "#";
+        send(full_message);
+
         haltReportBtn.setVisibility(View.INVISIBLE);
         startReportBtn.setVisibility(View.VISIBLE);
         recording_flag = false;
