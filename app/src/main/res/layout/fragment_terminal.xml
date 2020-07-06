@@ -22,7 +22,7 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/chart"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/eclipse01" />
+        app:srcCompat="@drawable/colorfulring2" />
 
     <TextView
         android:id="@+id/t_in_pic_pre1"
@@ -128,7 +128,7 @@
     <TextView
         android:id="@+id/current_temperature_left"
         android:layout_width="270dp"
-        android:layout_height="43dp"
+        android:layout_height="50dp"
         android:background="@color/colorPrimary"
         android:text="Current Temperature:"
         android:textSize="20sp"
@@ -139,12 +139,12 @@
 
     <TextView
         android:id="@+id/current_temperature"
-        android:layout_width="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
 
-        android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:text="-----"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toRightOf="@+id/current_temperature_left"
         app:layout_constraintRight_toLeftOf="@+id/current_temperature_right"
@@ -153,11 +153,12 @@
 
     <TextView
         android:id="@+id/current_temperature_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="50dp"
+
         android:background="@color/colorPrimary"
         android:text="°C"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@+id/received_text"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintRight_toRightOf="parent"

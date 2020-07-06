@@ -13,7 +13,7 @@
     <string name="scan">SCAN</string>
     <string name="stop">STOP</string>
     <string name="bluetooth_settings">Bluetooth settings</string>
-    <string name="devices">Bluetooth LE Devices</string>
+    <string name="devices">所有蓝牙设备</string>
     <string name="clear">Clear</string>
     <string name="newline_mode">Newline Mode</string>
     <string name="recording_true">记录中…</string>

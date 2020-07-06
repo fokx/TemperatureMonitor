@@ -352,7 +352,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     }
     private void send0AndsetVisibility() {
         String full_message = "c";
-        full_message += String.valueOf(MCUConnectStatus.CONNECTED_AND_RUNNING.getCode());
+        full_message += String.valueOf(MCUConnectStatus.CONNECTED_AND_HALTED.getCode());
         full_message += "#";
         send(full_message);
 
@@ -417,7 +417,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     private void send(String str) {
         if (connected != Connected.True) {
-            Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "未连接测温设备", Toast.LENGTH_SHORT).show();
             return;
         }
         try {
@@ -504,11 +504,11 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             int colorInterpolated = interpolateColor(colorCold, colorWarm, propotion);
             if (darkRotateBackgroundFlag) {
                 colorfulBackground.setBackgroundColor(colorRotateBackground);
-                colorfulBackground.setAlpha((float) 1.0);
+                colorfulBackground.setAlpha((float) 0.1);
 
             } else {
                 colorfulBackground.setBackgroundColor(colorInterpolated);
-                colorfulBackground.setAlpha((float) 0.7);
+                colorfulBackground.setAlpha((float) 1.0);
             }
 
         } catch (Exception e) {
@@ -602,7 +602,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
         // Add a limit line
         LimitLine ll = new LimitLine(ALERT_POINT_UPBOUND,
-                String.format("报警温度: %s", ALERT_POINT_UPBOUND));
+                String.format("高体温报警温度: %s", ALERT_POINT_UPBOUND));
         ll.setLineWidth(2f);
         ll.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         ll.setTextSize(10f);

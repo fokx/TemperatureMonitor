@@ -120,9 +120,9 @@ public class DevicesFragment extends ListFragment {
         };
 
 
-//        stopScan();
-        // TODO add history device list
         // bind terminal fragment to a specific HC-09 device
+//        // TODO add history device list
+        stopScan();
         BluetoothDevice device =BluetoothAdapter.getDefaultAdapter().
                 getRemoteDevice("90:9A:77:23:B9:AF");
 
@@ -131,7 +131,6 @@ public class DevicesFragment extends ListFragment {
         Fragment fragment = new TerminalFragment();
         fragment.setArguments(args);
         getFragmentManager().beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null).commit();
-        int i = 1;
 
     }
 

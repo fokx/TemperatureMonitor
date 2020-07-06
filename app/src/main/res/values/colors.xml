@@ -11,7 +11,10 @@
     <color name="colorBackground">#3498db</color>
     <color name="colorCold">#3498db</color>
     <color name="colorWarm">#ff5336</color>
-    <color name="colorRotateBackground">#2b2115</color>
+    <color name="colorRotateBackground2">#2b2115</color>
+<!--    <color name="colorRotateBackground">#2D8EE4</color>-->
+    <color name="colorRotateBackground">#cce8cf</color>
+<!--    <color name="colorTinPic">#2D8EE4</color>-->
     <color name="colorTinPic">#6db1c2</color>
 
 
