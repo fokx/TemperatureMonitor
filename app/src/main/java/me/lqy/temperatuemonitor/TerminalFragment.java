@@ -203,6 +203,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     /*
      * UI
      */
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_terminal, container, false);
@@ -236,7 +237,10 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         toggleLogBtn = view.findViewById(R.id.toggle_log_btn);
         sendDiv = view.findViewById(R.id.send_div);
         toggleViewPointsBtn = view.findViewById(R.id.toggle_webview);
+
+
         viewPoints = view.findViewById(R.id.view_points);
+//        viewPoints.setWebViewClient(new );
         WebSettings webSettings = viewPoints.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
@@ -271,6 +275,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         
         Log.w("CONNECTING TO", webviewAddress);
         viewPoints.loadUrl(webviewAddress);
+//        viewPoints.setHttpAuthUsernamePassword(webviewAddress,);
+
 //        imageViewSun.setAlpha((float) 0.3);
 
         update_picture_related_text();
