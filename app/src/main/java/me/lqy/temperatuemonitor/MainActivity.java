@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity
 
         MainViewModel model = new ViewModelProvider(this).get(MainViewModel.class);
         model.enableSyncDB();
+        model.enableHourlySync();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()

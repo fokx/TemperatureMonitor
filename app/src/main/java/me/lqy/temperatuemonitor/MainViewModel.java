@@ -12,6 +12,7 @@ import androidx.work.WorkManager;
 import java.util.concurrent.TimeUnit;
 
 import me.lqy.temperatuemonitor.workers.UploadWorker;
+import me.lqy.temperatuemonitor.workers.notifyWorker;
 
 public class MainViewModel extends AndroidViewModel {
     private WorkManager workManager;
@@ -37,4 +38,16 @@ public class MainViewModel extends AndroidViewModel {
         workManager.enqueue(uploadDBRequest);
     }
 
+    public void enableHourlySync() {
+        Constraints myConstraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+        PeriodicWorkRequest hourlyNotifyRequest =
+                new PeriodicWorkRequest.Builder(
+                        notifyWorker.class, 60, TimeUnit.MINUTES)
+                        .setConstraints(myConstraints)
+                        .addTag("hourlyNotify")
+                        .build();
+        workManager.enqueue(hourlyNotifyRequest);
+    }
 }

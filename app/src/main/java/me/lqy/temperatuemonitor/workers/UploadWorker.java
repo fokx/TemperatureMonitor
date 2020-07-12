@@ -19,6 +19,8 @@ import me.lqy.temperatuemonitor.Constants;
 import me.lqy.temperatuemonitor.database.DatabaseHelper;
 import me.lqy.temperatuemonitor.database.Point;
 
+import static me.lqy.temperatuemonitor.workers.WorkerUtils.makeStatusNotification;
+
 public class UploadWorker extends Worker {
     private Context context;
 
@@ -35,11 +37,6 @@ public class UploadWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-//        Context applicationContext = getApplicationContext();
-//
-//        WorkerUtils.makeStatusNotification("Blurring image", applicationContext);
-//        WorkerUtils.sleep();
-
         try {
             uploadDB();
             Log.w(TAG, "upload db every 15 mins");

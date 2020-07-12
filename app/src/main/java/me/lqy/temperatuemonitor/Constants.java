@@ -6,7 +6,7 @@ public class Constants {
     public static String VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION =
             "Shows notifications whenever work starts";
     public static final int NOTIFICATION_ID = 1;
-    public static final CharSequence NOTIFICATION_TITLE = "WorkRequest Starting";
+    public static final CharSequence NOTIFICATION_TITLE = "温馨提示：";
     public static final String CHANNEL_ID = "VERBOSE_NOTIFICATION";
     // not needed if not debug
     public static final long DELAY_TIME_MILLIS = 3000;
